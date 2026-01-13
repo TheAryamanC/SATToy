@@ -1,0 +1,14 @@
+a | b | c
+!a | !b | !c
+d | e | f
+!d | !e | !f
+g | h
+!g | !h
+!g | !b
+!h | b
+!a | h
+!g | c
+!b | f
+!c
+1 of x | y | z
+between 1 and 2 of foo | bar | baz
