@@ -330,6 +330,31 @@ namespace Assets.SAT
             }
         }
 
+        /// <summary>
+        /// Overwrite the current <see cref="Solution"/> with an externally computed assignment
+        /// (e.g. produced by MiniSat or Kissat) and rebuild the derived tables
+        /// (<see cref="TrueLiteralCounts"/> and <see cref="UnsatisfiedConstraints"/>).
+        /// Propositions absent from the dictionary default to false.
+        /// After calling this, inspect <see cref="IsSolved"/> to verify the assignment really
+        /// satisfies the original constraints (this is the safety net that catches any bug in
+        /// the CNF/cardinality encoding).
+        /// </summary>
+        public void ApplyAssignment(IDictionary<Proposition, bool> assignment)
+        {
+            Solution = new TruthAssignment(this, false);
+            foreach (var p in Propositions)
+                if (assignment != null && assignment.TryGetValue(p, out var value))
+                    Solution[p] = value;
+
+            for (var i = 0; i < Constraints.Count; i++)
+                TrueLiteralCounts[i] = Solution.TrueLiteralCount(Constraints[i]);
+
+            UnsatisfiedConstraints.Clear();
+            foreach (var c in Constraints)
+                if (Unsatisfied(c))
+                    UnsatisfiedConstraints.Add(c);
+        }
+
         #endregion
     }
 }
